@@ -1,0 +1,77 @@
+---
+title: "DNFC Report"
+author: "Matilda Stevenson"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{DNFC Report}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+```{r message=FALSE}
+# Load required libraries
+library(galah)
+library(dplyr)
+library(jsonlite)
+```
+
+
+```{r echo=FALSE}
+dsh_data <- fromJSON("https://dashboard.ala.org.au/dashboard/data")
+```
+
+Occurrence records in the ALA today
+```{r}
+records <- ala_counts()
+records
+```
+
+Datasets with records
+```{r}
+datasets <- dsh_data$datasets$dataAvailableCount[[1]]
+datasets
+```
+
+Total images
+```{r}
+# for some reason this isn't in dashboard data
+images <- fromJSON("https://images.ala.org.au/ws/getRepositoryStatistics")$imageCount
+images
+```
+
+
+Species with records
+```{r}
+species <- as.integer(dsh_data$taxaCounts$speciesWithRecords[[1]])
+species
+```
+
+Download events in the past month
+```{r}
+events_month <- fromJSON(
+  "https://logger.ala.org.au/service/reasonBreakdown?eventId=1002")$thisMonth$events
+
+events_total <- dsh_data$occurrenceDownloadByReason[14,]$Events
+
+paste0("Data download events from the 1st of this month to now: ", events_month)
+paste0("Total data download events: ", events_total)
+```
+
+Number of users per day
+```{r}
+user_data <- read.csv('/data/google_analytics/ga_data.csv')
+users <- user_data$users
+paste0("The total number of users in the past three months was ", users)
+
+start_month <- user_data$start_month
+end_month <- user_data$end_month
+```
+
+## Report outputs
+```{r}
+paste0("ALA Data Holdings – exceeds ", format(records, big.mark=","),
+       " biodiversity occurrence records across more than ", format(datasets, big.mark=","), " datasets for ",
+       format(species, big.mark=","), " species and over ", format(images, big.mark=","), " images")
+paste0("ALA Usage - ", events_total, " data download events (total) and ", format(users, big.mark=","),
+        " unique visitors to ALA web sites (3 months ", start_month, " - ", end_month, ")")
+```
