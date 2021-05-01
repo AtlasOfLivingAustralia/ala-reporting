@@ -1,0 +1,130 @@
+---
+title: "Tracking `galah` usage"
+author: "Matilda Stevenson"
+date: '`r Sys.Date()`'
+output: rmarkdown::html_vignette
+---
+
+```{r message=FALSE}
+library(dplyr)
+library(ggplot2)
+library(scales)
+library(lubridate)
+library(stringr)
+```
+
+### Versions of package being used
+Excludes CRAN, travis and `ala4r@ala.org.au` email. This data comes from the
+server logs stored in Kibana. The user-agent header is used to determine 
+which package and which versions of the package are being used.
+*Note: `koala` was the temporary name for `galah`.*
+
+```{r include=FALSE}
+# Behind the scenes work required to pull the relevant files from AWS S3
+library(paws)
+# Create an S3 object
+s3 <- paws::s3()
+# List all files holding Kibana data
+bucket_id <- Sys.getenv("AWS_BUCKET_ID")
+objs <- s3$list_objects(Bucket = bucket_id, Prefix = "kibana_data")
+# Condense the results into a more readable dataframe
+obj_df <- data.frame(
+  matrix(
+    unlist(objs$Contents),
+    nrow=length(objs$Contents),
+    byrow=TRUE
+    )
+  )
+names(obj_df) <- c("key", "last_modified", "etag", "size", "storage_class")
+
+# Package version data
+pkg_version_keys <- obj_df %>%
+  filter(grepl("package_versions", key)) %>%
+  pull(key)
+
+# Request path data
+request_path_keys <- obj_df %>%
+  filter(grepl("request_paths", key)) %>%
+  pull(key)
+
+# Requests by user-agent data
+requests_ua_keys <- obj_df %>%
+  filter(grepl("requests_by_ua", key)) %>%
+  pull(key)
+
+# Unique users by user-agent data
+users_ua_keys <- obj_df %>%
+  filter(grepl("unique_users_by_ua", key)) %>%
+  pull(key)
+
+# Given a vector of object names, download all the data
+get_data <- function(keys) {
+  data.table::rbindlist(lapply(keys, function(key) {
+    obj <- s3$get_object(
+      Bucket = Sys.getenv("AWS_BUCKET_ID"),
+      Key = key
+      )
+    read.csv(text = rawToChar(obj$Body))
+  }))
+}
+```
+
+```{r warning=FALSE, message=FALSE, fig.width=8}
+# Merge files from all dates
+counts <- get_data(pkg_version_keys)
+counts$date <- as.Date(counts$date)
+
+# Request counts over time
+ggplot(counts) + geom_point(mapping = aes(x = date, y = doc_count, colour = key)) +
+  scale_x_date(date_labels = "%b", date_break = "month")
+```
+
+### Number of requests with an email
+Excludes CRAN, travis and `ala4r@ala.org.au` email
+
+```{r warning=FALSE, message=FALSE, fig.width=8}
+# Merge files from all dates
+counts <- get_data(requests_ua_keys)
+counts$date <- as.Date(counts$date)
+counts <- counts %>% filter(user_agent_class %in% c("ALA4R 1.8.0", "ALA4R 1.9.0",
+                                                    "galah 1.0.0", "koala 1.0.0",
+                                                    "R", "python", "web-browser"))
+
+# Request counts over time
+ggplot(counts) + geom_point(mapping = aes(x = date, y = request_count,
+                                         colour = user_agent_class)) +
+  scale_x_date(date_labels = "%b", date_break = "month") +
+  scale_y_log10()
+```
+
+### Number of unique users downloading data with an email
+Excludes CRAN, travis and `ala4r@ala.org.au` email
+```{r warning=FALSE, message=FALSE, fig.width=8}
+# Merge files from all dates
+counts <- get_data(users_ua_keys)
+counts$date <- as.Date(counts$date)
+
+counts <- counts %>% filter(user_agent_class %in% c("ALA4R 1.8.0", "ALA4R 1.9.0",
+                                                    "galah 1.0.0", "koala 1.0.0",
+                                                    "R", "python", "web-browser"))
+
+# Request counts over time
+ggplot(counts) + geom_point(mapping = aes(x = date, y = unique_users,
+                                         colour = user_agent_class)) +
+        scale_y_log10() +
+        scale_x_date(date_labels = "%b", date_break = "month")
+```
+
+### Which endpoints are used by R users
+Excludes CRAN, travis and `ala4r@ala.org.au` email
+```{r warning=FALSE, message=FALSE, fig.width=8}
+# Merge files from all dates
+counts <- get_data(request_path_keys)
+counts$date <- as.Date(counts$date)
+
+# summarise by type
+grouped_counts <- counts %>% group_by(key2, path_type, date) %>%
+  summarise(total = sum(doc_count))
+
+# How to visualise this?
+```
