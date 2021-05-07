@@ -1,1 +1,1 @@
-rmarkdown::render()
+rmarkdown::render_site()
