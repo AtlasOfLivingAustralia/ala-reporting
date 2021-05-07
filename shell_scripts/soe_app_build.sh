@@ -5,6 +5,6 @@ git pull
 
 cd /srv/shiny-server/apps/
 
-Rscript /home/ste748/build_app.R &
+Rscript /data/ala-reporting/shell_scripts/build_app.R &
 sleep 15
 kill %1
