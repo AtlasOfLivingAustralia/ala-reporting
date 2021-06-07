@@ -87,7 +87,8 @@ Excludes CRAN, travis and `ala4r@ala.org.au` email
 counts <- get_data(requests_ua_keys)
 counts$date <- as.Date(counts$date)
 counts <- counts %>% filter(user_agent_class %in% c("ALA4R 1.8.0", "ALA4R 1.9.0",
-                                                    "galah 1.0.0", "koala 1.0.0",
+                                                    "galah 1.0.0", "galah 1.1.0",
+                                                    "koala 1.0.0",
                                                     "R", "python", "web-browser"))
 
 # Request counts over time
@@ -105,7 +106,8 @@ counts <- get_data(users_ua_keys)
 counts$date <- as.Date(counts$date)
 
 counts <- counts %>% filter(user_agent_class %in% c("ALA4R 1.8.0", "ALA4R 1.9.0",
-                                                    "galah 1.0.0", "koala 1.0.0",
+                                                    "galah 1.0.0", "galah 1.1.0",
+                                                    "koala 1.0.0",
                                                     "R", "python", "web-browser"))
 
 # Request counts over time
