@@ -72,6 +72,5 @@ end_month <- user_data$end_month
 paste0("ALA Data Holdings – exceeds ", format(records, big.mark=","),
        " biodiversity occurrence records across more than ", format(datasets, big.mark=","), " datasets for ",
        format(species, big.mark=","), " species and over ", format(images, big.mark=","), " images")
-paste0("ALA Usage - ", events_total, " data download events (total) and ", format("{Insert GA data here}", big.mark=","),
-        " unique visitors to ALA web sites (3 months ", start_month, " - ", end_month, ")")
+paste0("ALA Usage - ", events_total, " data download events (total) and ", format("{Insert GA data here}", big.mark=","))
 ```
