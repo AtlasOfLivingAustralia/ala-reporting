@@ -8,10 +8,10 @@ output:
     toc: true
     toc_float: true
     toc_depth: 3
-    include:
-      in_header: header.html
-      after_body: footer.html
-    css: style.css
+    # include:
+    #   in_header: header.html
+    #   after_body: footer.html
+    # css: style.css
 editor_options: 
   chunk_output_type: inline
 ---
