@@ -1,0 +1,130 @@
+---
+title: "galah pre-release"
+author: "Matilda Stevenson"
+date: "1/07/21"
+output:
+  html_document:
+    highlight: default
+    toc: true
+    toc_float: true
+    toc_depth: 3
+    include:
+      in_header: header.html
+      after_body: footer.html
+    css: style.css
+editor_options: 
+  chunk_output_type: inline
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(class.source = "chunk-highlight")
+htmltools::tagList(rmarkdown::html_dependency_font_awesome())
+```
+
+<!-- Picture & Links in upper right corner -->
+
+```{r upper right bio, echo = FALSE, include = FALSE}
+htmltools::withTags(
+  div(id = "pictureposition",
+      
+# Save your own picture as "picture.jpg" to local directory
+      img(src = knitr::image_uri("picture.jpg"),
+          class = "clipped",
+          style = 'height:120px'),
+
+# Add links to personal accounts below and uncomment
+      div(id = "linkposition",                   
+          a(href="https://matildastevenson.com", # personal website
+            class="fas fa-globe",
+            style = "text-align:center"),
+          a(href="https://github.com/matildastevenson/", # github
+            class="fab fa-github",
+            style = "text-align:center")
+          )))
+
+```
+
+
+
+------------------------------------------------------------------------------
+This document outlines the checks required before submitting `galah` to CRAN.
+<br>
+
+------------------------------------------------------------------------------
+
+## Testing
+
+Much of the testing of `galah` is automated, and test coverage is good but there
+are still a few things that aren't/can't be covered in automated testing. Test
+coverage information is available [here](https://app.codecov.io/gh/AtlasOfLivingAustralia/galah).
+
+### Automated tests
+```{r eval=FALSE}
+# Run all tests
+devtools::test()
+
+# Run individual tests
+devtools::test_active_file()
+```
+
+### Manual tests
+Some examples of things to check are here (this is not an exhaustive list)  
+
+* https://confluence.csiro.au/display/ALASD/galah+and+ALA4R+functional+tests
+* International Atlas configuration
+* Documentation
+
+### Documentation checks
+First, build all the documentation. Hopefully nothing changes when this is run
+as it should have been done when documentation was updated.
+```{r eval = FALSE}
+roxygen2::roxygenise()
+```
+Then build the `pkgdown` site locally
+```{r eval = FALSE}
+pkgdown::build_site()
+```
+<br>
+
+------------------------------------------------------------------------------
+
+
+## Local checks
+Ideally these commands should be run outside RStudio
+```{bash eval=FALSE}
+# Assuming we are in the galah directory 
+cd ..
+R CMD build galah
+# wait for it to finish
+R CMD check galah_1.2.0.tar.gz
+## check as CRAN
+R CMD check --as-cran galah_1.2.0.tar.gz
+```
+
+## External checks
+```{r eval = FALSE}
+rhub::check_for_cran()
+```
+
+
+### Winbuilder 
+Winbuilder is software to check R packages for Windows. To use winbuilder to 
+check the package:  
+
+* Find the built and zipped package on your system. It will be in the format
+`galah_{version}.tar.gz`. 
+* Upload the package to [winbuilder](https://win-builder.r-project.org/upload.aspx)- 
+only the first and second sections as `galah` doesn't support versions below 
+4.0.0
+* Wait for emails to maintainer
+
+### Travis
+Travis is Continuous Integration software. It builds and checks the package on
+an external server. Checks are run automatically anytime code is pushed to 
+GitHub, and the results are visible [here](https://travis-ci.com/AtlasOfLivingAustralia/galah)
+
+## ALA Admin
+All software releases must be approved by the Change Advisory Board (CAB).
+Change requests are created in JIRA, and approved by various people. It is just
+to check that due diligence has been done. Most parts can be copied over from
+one release to the next.
