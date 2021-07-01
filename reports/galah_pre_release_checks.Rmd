@@ -21,29 +21,6 @@ knitr::opts_chunk$set(class.source = "chunk-highlight")
 htmltools::tagList(rmarkdown::html_dependency_font_awesome())
 ```
 
-<!-- Picture & Links in upper right corner -->
-
-```{r upper right bio, echo = FALSE, include = FALSE}
-htmltools::withTags(
-  div(id = "pictureposition",
-      
-# Save your own picture as "picture.jpg" to local directory
-      img(src = knitr::image_uri("picture.jpg"),
-          class = "clipped",
-          style = 'height:120px'),
-
-# Add links to personal accounts below and uncomment
-      div(id = "linkposition",                   
-          a(href="https://matildastevenson.com", # personal website
-            class="fas fa-globe",
-            style = "text-align:center"),
-          a(href="https://github.com/matildastevenson/", # github
-            class="fab fa-github",
-            style = "text-align:center")
-          )))
-
-```
-
 
 
 ------------------------------------------------------------------------------
@@ -127,4 +104,4 @@ GitHub, and the results are visible [here](https://travis-ci.com/AtlasOfLivingAu
 All software releases must be approved by the Change Advisory Board (CAB).
 Change requests are created in JIRA, and approved by various people. It is just
 to check that due diligence has been done. Most parts can be copied over from
-one release to the next.
+one release to the next. The change request register can be viewed [here](https://jira-sd.csiro.au/projects/ACRR/queues/custom/367/ACRR-237)
